@@ -12,7 +12,7 @@ mod state;
 mod words;
 
 fn main() {
-    let mut state = State::with_word("RIPED".to_string());
+    let mut state = State::new();
     execute!(stdout(), Hide).unwrap();
     state.render().unwrap();
     while !state.is_finished() {
