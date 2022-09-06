@@ -93,7 +93,7 @@ impl State {
         }
         queue!(stdout, Print(&self.input))?;
         if self.input.len() < 5 && self.guesses.len() < 6 {
-            queue!(stdout, Print("_"))?;
+            queue!(stdout, Print("_".dark_grey()))?;
         };
         if self.guesses.len() < 6 {
             queue!(stdout, Print("\n"))?;
@@ -105,13 +105,15 @@ impl State {
 
         if self.is_finished() {
             let num_guesses = self.guesses.len();
-            if num_guesses == 1 {
-                queue!(stdout, Print("\n\nGuessed in 1 try"))?;
-            } else if num_guesses < 6 {
-                queue!(
-                    stdout,
-                    Print(format!("\n\nGuessed in {} tries", num_guesses))
-                )?;
+            if self.guesses.last().unwrap().word == self.answer {
+                if num_guesses == 1 {
+                    queue!(stdout, Print("\n\nGuessed in 1 try"))?;
+                } else {
+                    queue!(
+                        stdout,
+                        Print(format!("\n\nGuessed in {} tries", num_guesses))
+                    )?;
+                };
             } else {
                 queue!(
                     stdout,
