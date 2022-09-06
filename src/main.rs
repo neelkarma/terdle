@@ -1,7 +1,7 @@
 use std::io::stdout;
 
 use crossterm::{
-    cursor::Hide,
+    cursor::{Hide, Show},
     event::{read, Event, KeyCode},
     execute,
 };
@@ -27,4 +27,5 @@ fn main() {
         };
         state.render().unwrap();
     }
+    execute!(stdout(), Show).unwrap();
 }

@@ -1,8 +1,11 @@
-use std::{collections::BTreeMap, io::stdout};
+use std::{
+    collections::BTreeMap,
+    io::{stdout, Write},
+};
 
 use crossterm::{
     cursor::MoveTo,
-    execute,
+    queue,
     style::{Print, Stylize},
     terminal::{Clear, ClearType},
 };
@@ -81,41 +84,42 @@ impl State {
 
     pub fn render(&self) -> crossterm::Result<()> {
         let mut stdout = stdout();
-        execute!(stdout, Clear(ClearType::All), MoveTo(0, 0))?;
+        queue!(stdout, Clear(ClearType::All), MoveTo(0, 0))?;
         for guess in &self.guesses {
             for (chr, res) in guess.iter() {
-                execute!(stdout, Print(chr.with(res.to_color())))?;
+                queue!(stdout, Print(chr.with(res.to_color())))?;
             }
-            execute!(stdout, Print("\n"))?;
+            queue!(stdout, Print("\n"))?;
         }
-        execute!(stdout, Print(&self.input))?;
+        queue!(stdout, Print(&self.input))?;
         if self.input.len() < 5 && self.guesses.len() < 6 {
-            execute!(stdout, Print("_"))?;
+            queue!(stdout, Print("_"))?;
         };
         if self.guesses.len() < 6 {
-            execute!(stdout, Print("\n"))?;
+            queue!(stdout, Print("\n"))?;
         }
-        execute!(stdout, Print("\n"))?;
+        queue!(stdout, Print("\n"))?;
         for (chr, res) in &self.letters {
-            execute!(stdout, Print(format!("{}", chr).with(res.to_color())))?;
+            queue!(stdout, Print(format!("{}", chr).with(res.to_color())))?;
         }
 
         if self.is_finished() {
             let num_guesses = self.guesses.len();
             if num_guesses == 1 {
-                execute!(stdout, Print("\n\nGuessed in 1 try"))?;
+                queue!(stdout, Print("\n\nGuessed in 1 try"))?;
             } else if num_guesses < 6 {
-                execute!(
+                queue!(
                     stdout,
                     Print(format!("\n\nGuessed in {} tries", num_guesses))
                 )?;
             } else {
-                execute!(
+                queue!(
                     stdout,
                     Print(format!("\n\nThe correct word was {}", self.answer))
                 )?;
             };
         };
+        stdout.flush()?;
         Ok(())
     }
 }

@@ -8,3 +8,9 @@ edition = "2021"
 [dependencies]
 crossterm = "0.25.0"
 rand = "0.8"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
