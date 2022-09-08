@@ -13,7 +13,7 @@ use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
     guess::{Guess, GuessResult},
-    words::WORDS,
+    words::{OTHER_WORDS, START_WORDS},
 };
 
 pub struct State {
@@ -25,7 +25,7 @@ pub struct State {
 
 impl State {
     pub fn new() -> Self {
-        let answer = WORDS.choose(&mut thread_rng()).unwrap().to_string();
+        let answer = START_WORDS.choose(&mut thread_rng()).unwrap().to_string();
         return Self::with_word(answer);
     }
 
@@ -60,7 +60,10 @@ impl State {
     }
 
     pub fn handle_return(&mut self) {
-        if self.input.len() != 5 || !WORDS.contains(&self.input.as_ref()) {
+        if self.input.len() != 5
+            || !(START_WORDS.contains(&self.input.as_ref())
+                || OTHER_WORDS.contains(&self.input.as_ref()))
+        {
             return;
         };
         self.guesses
