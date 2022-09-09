@@ -30,10 +30,10 @@ fn main() {
                     KeyCode::Char(chr) => state.handle_input(chr),
                     KeyCode::Backspace => state.handle_backspace(),
                     KeyCode::Enter => state.handle_return(),
-                    _ => (),
+                    _ => continue,
                 };
             }
-            _ => (),
+            _ => continue,
         };
         state.render().unwrap();
     }
