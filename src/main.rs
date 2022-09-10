@@ -6,7 +6,8 @@ use crossterm::{
     execute,
     terminal::enable_raw_mode,
 };
-use state::State;
+
+use crate::state::State;
 
 mod guess;
 mod hints;
@@ -24,6 +25,8 @@ fn main() {
                 if event.code == KeyCode::Char('c')
                     && event.modifiers.contains(KeyModifiers::CONTROL)
                 {
+                    state.handle_exit();
+                    state.render().unwrap();
                     exit(0);
                 };
 

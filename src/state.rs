@@ -19,6 +19,7 @@ pub struct State {
     pub guesses: Vec<Guess>,
     pub hints: Hints,
     pub input: String,
+    pub exited: bool,
 }
 
 impl State {
@@ -32,13 +33,19 @@ impl State {
         let guesses = Vec::new();
         let input = String::new();
         let hints = Hints::new();
+        let exited = false;
 
         Self {
             answer,
             guesses,
             input,
             hints,
+            exited,
         }
+    }
+
+    pub fn handle_exit(&mut self) {
+        self.exited = true;
     }
 
     pub fn handle_input(&mut self, chr: char) {
@@ -76,6 +83,7 @@ impl State {
             .collect::<Vec<_>>()
             .contains(&&self.answer)
             || self.guesses.len() >= 6
+            || self.exited
     }
 
     pub fn render(&self) -> crossterm::Result<()> {
@@ -101,7 +109,12 @@ impl State {
 
         if self.is_finished() {
             let num_guesses = self.guesses.len();
-            if self.guesses.last().unwrap().word == self.answer {
+            if self.exited {
+                queue!(
+                    stdout,
+                    Print(format!("\n\nThe correct word was {}", self.answer))
+                )?;
+            } else if self.guesses.last().unwrap().word == self.answer {
                 if num_guesses == 1 {
                     queue!(stdout, Print("\n\nGuessed in 1 try"))?;
                 } else {
