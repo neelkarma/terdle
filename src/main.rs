@@ -9,6 +9,7 @@ use crossterm::{
 use state::State;
 
 mod guess;
+mod hints;
 mod state;
 mod words;
 

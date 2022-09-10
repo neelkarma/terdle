@@ -1,7 +1,4 @@
-use std::{
-    collections::BTreeMap,
-    io::{stdout, Write},
-};
+use std::io::{stdout, Write};
 
 use crossterm::{
     cursor::MoveTo,
@@ -12,14 +9,15 @@ use crossterm::{
 use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
-    guess::{Guess, GuessResult},
+    guess::Guess,
+    hints::Hints,
     words::{OTHER_WORDS, START_WORDS},
 };
 
 pub struct State {
     pub answer: String,
     pub guesses: Vec<Guess>,
-    pub letters: BTreeMap<char, GuessResult>,
+    pub hints: Hints,
     pub input: String,
 }
 
@@ -33,18 +31,13 @@ impl State {
         let answer = answer.to_ascii_uppercase();
         let guesses = Vec::new();
         let input = String::new();
-
-        let mut letters = BTreeMap::new();
-        for code in b'A'..=b'Z' {
-            let chr = code as char;
-            letters.insert(chr, GuessResult::Default);
-        }
+        let hints = Hints::new();
 
         Self {
             answer,
             guesses,
             input,
-            letters,
+            hints,
         }
     }
 
@@ -70,7 +63,7 @@ impl State {
             .push(Guess::new(self.input.clone(), &self.answer));
 
         for (chr, res) in self.guesses.last().unwrap().iter() {
-            *self.letters.get_mut(&chr).unwrap() = res;
+            self.hints.set(chr, res);
         }
 
         self.input = String::new();
@@ -102,7 +95,7 @@ impl State {
             queue!(stdout, Print("\n"))?;
         }
         queue!(stdout, Print("\n"))?;
-        for (chr, res) in &self.letters {
+        for (chr, res) in &self.hints.iter() {
             queue!(stdout, Print(format!("{}", chr).with(res.to_color())))?;
         }
 
