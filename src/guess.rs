@@ -31,8 +31,7 @@ impl Guess {
     pub fn new(guess: String, answer: &str) -> Self {
         let word = guess;
         let mut results = [GuessResult::NotPresent; 5];
-        for (idx, chrs) in word.chars().zip(answer.chars()).enumerate() {
-            let (gchr, achr) = chrs;
+        for (idx, (gchr, achr)) in word.chars().zip(answer.chars()).enumerate() {
             if achr == gchr {
                 results[idx] = GuessResult::Correct;
             } else if answer.contains(gchr) {
