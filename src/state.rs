@@ -1,10 +1,9 @@
-use std::io::{stdout, Write};
+use std::io::stdout;
 
 use crossterm::{
     cursor::MoveTo,
-    queue,
+    execute,
     style::{Print, Stylize},
-    terminal::{Clear, ClearType},
 };
 use rand::{seq::SliceRandom, thread_rng};
 
@@ -87,50 +86,46 @@ impl State {
     }
 
     pub fn render(&self) -> crossterm::Result<()> {
-        let mut stdout = stdout();
-        queue!(stdout, Clear(ClearType::All), MoveTo(0, 0))?;
+        let mut out = String::new();
+
         for guess in &self.guesses {
             for (chr, res) in guess.iter() {
-                queue!(stdout, Print(chr.with(res.to_color())))?;
+                out.push_str(&chr.with(res.to_color()).to_string());
             }
-            queue!(stdout, Print("\n"))?;
+            out.push('\n');
         }
-        queue!(stdout, Print(&self.input))?;
+        out.push_str(&self.input);
         if self.input.len() < 5 && self.guesses.len() < 6 {
-            queue!(stdout, Print("_".dark_grey()))?;
-        };
-        if self.guesses.len() < 6 {
-            queue!(stdout, Print("\n"))?;
+            out.push_str(&"_".dark_grey().to_string());
         }
-        queue!(stdout, Print("\n"))?;
+        out.push_str(&" ".repeat(5 - self.input.len()));
+        if self.guesses.len() < 6 {
+            out.push('\n');
+        }
+        out.push_str(&" ".repeat(26));
+        out.push('\n');
+
         for (chr, res) in &self.hints.iter() {
-            queue!(stdout, Print(format!("{}", chr).with(res.to_color())))?;
+            out.push_str(&chr.with(res.to_color()).to_string());
         }
 
         if self.is_finished() {
+            out.push_str("\n\n");
             let num_guesses = self.guesses.len();
             if self.exited {
-                queue!(
-                    stdout,
-                    Print(format!("\n\nThe correct word was {}", self.answer))
-                )?;
+                out.push_str(&format!("The correct word was {}", &self.answer));
             } else if self.guesses.last().unwrap().word == self.answer {
                 if num_guesses == 1 {
-                    queue!(stdout, Print("\n\nGuessed in 1 try"))?;
+                    out.push_str("Guessed in 1 try");
                 } else {
-                    queue!(
-                        stdout,
-                        Print(format!("\n\nGuessed in {} tries", num_guesses))
-                    )?;
+                    out.push_str(&format!("Guessed in {} tries", num_guesses));
                 };
             } else {
-                queue!(
-                    stdout,
-                    Print(format!("\n\nThe correct word was {}", self.answer))
-                )?;
+                out.push_str(&format!("The correct word was {}", &self.answer));
             };
-        };
-        stdout.flush()?;
+        }
+
+        execute!(stdout(), MoveTo(0, 0), Print(out))?;
         Ok(())
     }
 }

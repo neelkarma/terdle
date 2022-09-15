@@ -4,7 +4,7 @@ use crossterm::{
     cursor::{Hide, Show},
     event::{read, Event, KeyCode, KeyModifiers},
     execute,
-    terminal::enable_raw_mode,
+    terminal::{enable_raw_mode, Clear, ClearType},
 };
 
 use crate::state::State;
@@ -16,7 +16,7 @@ mod words;
 
 fn main() {
     let mut state = State::new();
-    execute!(stdout(), Hide).unwrap();
+    execute!(stdout(), Clear(ClearType::All), Hide).unwrap();
     enable_raw_mode().unwrap();
     state.render().unwrap();
     while !state.is_finished() {
