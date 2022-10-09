@@ -1,5 +1,3 @@
-use std::{array::IntoIter, iter::Zip, str::Chars};
-
 use crossterm::style::Color;
 
 #[derive(Debug, Clone, Copy)]
@@ -41,7 +39,7 @@ impl Guess {
         Self { word, results }
     }
 
-    pub fn iter(&self) -> Zip<Chars, IntoIter<GuessResult, 5>> {
+    pub fn iter(&self) -> impl Iterator<Item = (char, GuessResult)> + '_ {
         self.word.chars().zip(self.results)
     }
 }
