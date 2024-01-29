@@ -88,12 +88,15 @@ impl State {
     pub fn render(&self) -> crossterm::Result<()> {
         let mut out = String::new();
 
+        // Previous guesses
         for guess in &self.guesses {
             for (chr, res) in guess.iter() {
                 out.push_str(&chr.with(res.to_color()).to_string());
             }
             out.push('\n');
         }
+
+        // Current user input
         out.push_str(&self.input);
         if self.input.len() < 5 && self.guesses.len() < 6 {
             out.push_str(&"_".dark_grey().to_string());
@@ -105,10 +108,12 @@ impl State {
         out.push_str(&" ".repeat(26));
         out.push('\n');
 
+        // Hints
         for (chr, res) in &self.hints.iter() {
             out.push_str(&chr.with(res.to_color()).to_string());
         }
 
+        // Finished text
         if self.is_finished() {
             out.push_str("\n\n");
             let num_guesses = self.guesses.len();
